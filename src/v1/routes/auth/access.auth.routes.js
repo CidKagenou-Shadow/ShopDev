@@ -1,12 +1,17 @@
 const express = require("express");
-const { login } = require("../../controllers/auth.controllers");
-const { register } = require("../../controllers/auth.controllers");
+const { login,register,logout, handleRefreshToken } = require("../../controllers/auth.controllers");
+const { authentications } = require("../../auth/auth.auth");
 const router = express.Router();
+
 
 
 router.post("/register", register);
 router.post("/login", login);
-router.post("/logout",logout);
+router.post("/refresh-token",handleRefreshToken)
+//authenticate token middleware
+router.use(authentications);
+
+router.post("/logout", logout);
 
 
 

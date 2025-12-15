@@ -6,6 +6,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const router = require("./src/v1/routes/route.js");
 const config = require("./src/v1/configs/app.config.js");
+const { AutoCreateApiKeyMiddleware } = require("./src/v1/middlewares/auth/apiKey.auth.middleware.js");
 
 //middleware
 
@@ -18,8 +19,21 @@ app.use(morgan("dev"));
 //database
 require("./src/v1/databases/connect.databases.js");
 
+
+AutoCreateApiKeyMiddleware();
 //router
 app.use("/", router);
+
+
+app.use((err, req, res, next) => {
+  console.error(err);
+
+  const statusCode = err.status || 500;
+
+  res.status(statusCode).json({
+    message: err.message || "Internal Server Error"
+  });
+});
 
 app.listen(config.APP_PORT, () => {
   console.log(

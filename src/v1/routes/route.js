@@ -1,12 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const tokenAuthMiddleware = require("../middlewares/auth/tokens.auth.middleware.js");
+const { authentications } = require("../auth/auth.auth.js");
+const { checkApiKey, checkPermission } = require("../middlewares/auth/apiKey.auth.middleware.js");
+
+router.use(checkApiKey,checkPermission("0000"));
+
 
 router.use("/v1/auth", require("./auth/access.auth.routes"));
 
 
 //authentication
-router.use(tokenAuthMiddleware);
+router.use(authentications);
 
 
 //shop

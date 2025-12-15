@@ -1,0 +1,26 @@
+version: '3.8'
+networks:
+  ShopDev_network:
+    driver: bridge
+  
+
+services:
+  database:
+    image: mongo:8.0
+    container_name: ShopDevDB
+    restart: always
+    ports:
+      - "27000:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: tankhangkm12
+      MONGO_INITDB_ROOT_PASSWORD: TanKhangkm122@
+      MONGO_INITDB_DATABASE: ShopDev
+    networks:
+      - ShopDev_network
+
+volumes:
+  mongo_data:
+
+    

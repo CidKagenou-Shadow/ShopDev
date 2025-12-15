@@ -55,6 +55,18 @@ class UnauthorizedError extends ErrorResponse {
     }
 }
 
+class UnauthenticatedError extends ErrorResponse {
+    constructor({
+        message = "Unauthenticated",
+        metadata = {}
+    }) {
+        super({
+            message,
+            statusCode: 401,
+            metadata
+        });
+    }
+}
 /**
  * 403 Forbidden
  */
@@ -140,5 +152,6 @@ module.exports = {
     NotFoundError,
     ConflictError,
     InternalServerError,
-    ExistedError
+    ExistedError,
+    UnauthenticatedError
 };

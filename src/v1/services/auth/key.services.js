@@ -30,12 +30,39 @@ const createKeyModel = async ({
     }
 }
 
-const findKeyByUserId = async (userId) => {
-    return await keySchema.findOne({ user: userId });
+const findKeyByUserId = async (key) => {
+    return await keySchema.findOne({ user: key }).lean()
+}
+
+const removeKeyByUserId = async (userId) => {
+    return await keySchema.deleteOne({ user: userId });
 }
 
 
+const checkRefreshTokenUsed = async (refreshToken) =>{
+    return await keySchema.findOne({ refreshTokensUsed: refreshToken }).lean();
+}
+
+const removeKeyStore = async (userId) => {
+    return await keySchema.deleteOne({ user: userId });
+}
+
+const addRefreshTokenUsed = async (userId, refreshToken,newPublicKey) => {
+    return await keySchema.findOneAndUpdate(
+        { user: userId },                     
+        {
+            publicKey : newPublicKey,                     
+            $addToSet: {
+                refreshTokensUsed: refreshToken
+            }
+        }
+  ).lean();
+};
 module.exports = {
     createKeyModel,
-    findKeyByUserId
+    findKeyByUserId,
+    removeKeyByUserId,
+    checkRefreshTokenUsed,
+    removeKeyStore,
+    addRefreshTokenUsed
 };

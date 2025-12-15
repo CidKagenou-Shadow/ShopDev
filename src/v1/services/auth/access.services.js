@@ -1,17 +1,18 @@
 const {    
     findShopByEmail,
-    createShop,
+    createShop
 } = require("../../models/repositories/shop.repo.js");
 
 const {
-    signTokenPair
-} = require("../../auth/tokens.auth.js");
+    signTokenPair,
+    verfifyToken
+} = require("../../auth/tokens.auth.utils.js");
 
 const crypto = require('crypto');
 const bcrypt = require("bcryptjs");
-const { createKeyModel } = require("./key.services.js");
+const { createKeyModel, removeKeyByUserId, checkRefreshTokenUsed, removeKeyStore, findKeyByUserId, addRefreshTokenUsed } = require("./key.services.js");
 const { getDataInfo } = require("../../utils/getDataInfo.util.js");
-const { ErrorResponse, UnauthorizedError, NotFoundError, ExistedError } = require("../../core/response/error.response.js");
+const { ErrorResponse, UnauthorizedError, NotFoundError, ExistedError, ForbiddenError } = require("../../core/response/error.response.js");
 const { OK } = require("../../core/response/success.response.js");
 
 const ROLES = {
@@ -108,7 +109,65 @@ const registerShopService = async ({email, password, name}) => {
     }
 }
 
+const logoutShopService = async (shopId) => {
+    if (!shopId) throw new NotFoundError({message: "Shop ID is required for logout"});
+
+    const result = await removeKeyByUserId(shopId);
+
+    if (result.deletedCount === 0) {
+        throw new NotFoundError({message: "No active session found for this shop"});
+    }
+
+    return result;
+}
+
+const handlerRefreshToken = async (userId,refreshToken) => {
+    const keyStore = await findKeyByUserId(userId);
+    if (!keyStore) throw new NotFoundError({message: "KeyStore not found"});
+
+    if (keyStore.refreshTokensUsed.includes(refreshToken)) {
+        await removeKeyStore(userId);
+        throw new ForbiddenError({message: "Refresh token reuse detected. All sessions revoked."});
+    }
+    const decoded = verfifyToken(refreshToken, keyStore.publicKey);
+    if (!decoded) throw new UnauthorizedError({message: "Invalid refresh token"});
+
+    const {privateKey, publicKey} = crypto.generateKeyPairSync('rsa', {
+        modulusLength: 2048,
+        publicKeyEncoding: {
+            type: 'pkcs1',
+            format: 'pem'
+        },
+        privateKeyEncoding: {
+            type: 'pkcs1',
+            format: 'pem'
+        }
+    });
+
+    const newKeyStore = await addRefreshTokenUsed(userId,refreshToken,publicKey.toString());
+
+    if (!newKeyStore) throw new ErrorResponse({
+        statusCode : 500,
+        message : "Error update keyStore !"
+    })
+    const tokens = signTokenPair(
+        {
+            payload : { shopId: decoded.shopId, roles: decoded.roles },
+            publicKey : newKeyStore.publicKey,
+            privateKey
+        }
+    );
+
+
+
+    return {
+        tokens : tokens
+    }
+
+}
 module.exports = {
     loginShopService,
-    registerShopService
+    registerShopService,
+    logoutShopService,
+    handlerRefreshToken
 };
