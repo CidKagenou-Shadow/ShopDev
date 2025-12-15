@@ -4,3 +4,6 @@ npm-debug.log
 .gitignore
 .env
 README.md
+Dockerfile
+docker-compose.yaml
+nginx/

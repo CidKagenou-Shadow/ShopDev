@@ -1,8 +1,11 @@
-version: '3.8'
+version: "3.8"
+
 networks:
   ShopDev_network:
     driver: bridge
-  
+
+volumes:
+  mongo_data:
 
 services:
   database:
@@ -10,7 +13,7 @@ services:
     container_name: ShopDevDB
     restart: always
     ports:
-      - "27000:27017"
+      - "27000:27017"   # optional, for host access
     volumes:
       - mongo_data:/data/db
     environment:
@@ -19,8 +22,66 @@ services:
       MONGO_INITDB_DATABASE: ShopDev
     networks:
       - ShopDev_network
+  app-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: shopdev-app:latest
+    container_name: ShopDevApp-1
+    restart: always
+    depends_on:
+      - database
+    env_file:
+      - .env
+    ports:
+      - "1201:1201"
+    networks:
+      - ShopDev_network
 
-volumes:
-  mongo_data:
+  app-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: shopdev-app:latest
+    container_name: ShopDevApp-2
+    restart: always
+    depends_on:
+      - database
+    env_file:
+      - .env
+    ports:
+      - "1202:1201"
+    networks:
+      - ShopDev_network
+  app-3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: shopdev-app:latest
+    container_name: ShopDevApp-3
+    restart: always
+    depends_on:
+      - database
+    env_file:
+      - .env
+    ports:
+      - "1203:1201"
+    networks:
+      - ShopDev_network
 
-    
+  nginx:
+    image : docker.io/library/nginx
+    container_name: ShopDevProxyNginx
+    ports:
+      - "1200:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app-1
+      - app-2
+      - app-3
+    networks:
+      - ShopDev_network
+
+  
+
