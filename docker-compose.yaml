@@ -75,7 +75,7 @@ services:
     ports:
       - "1200:80"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:Z
     depends_on:
       - app-1
       - app-2
