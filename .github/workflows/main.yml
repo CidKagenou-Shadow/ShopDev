@@ -23,6 +23,7 @@ jobs:
         working-directory: /home/ShopDev/
         run: |
           rm -rf ShopDev
+          dir
           git clone https://github.com/CidKagenou-Shadow/ShopDev.git
       - name: Copy env file
         run: |
