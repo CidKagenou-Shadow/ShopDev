@@ -31,5 +31,7 @@ jobs:
       - name: Deploy with Docker Compose
         working-directory: /home/ShopDev/ShopDev
         run: |
+          docker ps
           docker compose down
+          docker ps
           docker compose up -d --build
