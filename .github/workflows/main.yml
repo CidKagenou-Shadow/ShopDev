@@ -34,3 +34,8 @@ jobs:
         run: |
           podman-compose down
           podman-compose up -d
+
+      - name: check
+        run: |
+          podman ps
+
