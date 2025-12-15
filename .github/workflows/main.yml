@@ -9,38 +9,55 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+      # 0. Show environment (debug an toàn)
       - name: Show environment
         run: |
           whoami
           uname -a
-          pwd
           podman --version
           podman-compose --version
-      - name : remove and clone code
-        working-directory: /home/ShopDev/
+
+      # 1. Clone repo if not exist, else update
+      - name: Clone or update source
+        working-directory: /home/ShopDev
         run: |
-          rm -rf ShopDev
-          dir
-          git clone https://github.com/CidKagenou-Shadow/ShopDev.git
-      - name: Copy env file
+          if [ ! -d ShopDev/.git ]; then
+            echo "Repo not found, cloning..."
+            git clone https://github.com/CidKagenou-Shadow/ShopDev.git
+          else
+            echo "Repo exists, updating..."
+            cd ShopDev
+            git fetch origin
+            git reset --hard origin/main
+          fi
+
+      # 2. Ensure .env exists (KHÔNG ghi đè nếu đã có)
+      - name: Prepare env
         run: |
-          ls -la /home/ShopDev/ShopDev
-          cp /home/ShopDev/.env /home/ShopDev/ShopDev/.env
-          ls -la /home/ShopDev/ShopDev
-      - name: Build containers
+          if [ ! -f /home/ShopDev/ShopDev/.env ]; then
+            echo ".env not found, copying from home..."
+            cp /home/ShopDev/.env /home/ShopDev/ShopDev/.env
+            chmod 600 /home/ShopDev/ShopDev/.env
+          else
+            echo ".env already exists, skip"
+          fi
+
+      # 3. Build images (CI task – không giữ process)
+      - name: Build images
         working-directory: /home/ShopDev/ShopDev
-        run: podman-compose build
-
-      - name: Deploy
-        working-directory: /home/ShopDev/ShopDev
         run: |
-          podman-compose down
-          podman-compose up -d
+          podman-compose build
 
-      - name: check
+      # 4. Restart services (SYSTEMD OWNS LIFECYCLE)
+      - name: Restart services
         run: |
-          podman ps
+          systemctl --user restart container-ShopDevDB
+          systemctl --user restart container-ShopDevApp-1
+          systemctl --user restart container-ShopDevApp-2
+          systemctl --user restart container-ShopDevProxyNginx
 
+      # 5. Health check (đảm bảo deploy thành công)
+      - name: Health check
+        run: |
+          sleep 5
+          curl -f http://localhost:1200 || exit 1
