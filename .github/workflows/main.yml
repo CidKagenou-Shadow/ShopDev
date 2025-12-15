@@ -1,1 +1,30 @@
+name: ShopDevCICD
+
+on:
+    push:
+        branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Show environment
+        run: |
+            whoami
+            uname -a
+            podman --version
+
+      - name: copy env-file
+        run: /
+            cp /home/ShopDev/.env /home/ShopDev/ShopDev
+            ls -la /home/ShopDev/ShopDev
+        
+      - name: Build containers
+        run: podman-compose build
+
+      - name: Deploy
+        run: |
+            podman-compose down
+            podman-compose up -d
 
