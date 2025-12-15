@@ -27,9 +27,9 @@ jobs:
           git clone https://github.com/CidKagenou-Shadow/ShopDev.git
       - name: Copy env file
         run: |
+          ls -la /home/ShopDev/ShopDev
           cp /home/ShopDev/.env /home/ShopDev/ShopDev/.env
           ls -la /home/ShopDev/ShopDev
-
       - name: Build containers
         working-directory: /home/ShopDev/ShopDev
         run: podman-compose build
