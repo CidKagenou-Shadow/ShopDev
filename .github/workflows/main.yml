@@ -9,55 +9,27 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      # 0. Show environment (debug an toàn)
       - name: Show environment
         run: |
           whoami
           uname -a
-          podman --version
-          podman-compose --version
+          docker --version
+          docker compose version
 
-      # 1. Clone repo if not exist, else update
-      - name: Clone or update source
-        working-directory: /home/ShopDev
+      - name: Update source
+        working-directory: /home/ShopDev/ShopDev
         run: |
-          if [ ! -d ShopDev/.git ]; then
-            echo "Repo not found, cloning..."
-            git clone https://github.com/CidKagenou-Shadow/ShopDev.git
-          else
-            echo "Repo exists, updating..."
-            cd ShopDev
-            git fetch origin
-            git reset --hard origin/main
-          fi
+          git fetch origin
+          git reset --hard origin/main
 
-      # 2. Ensure .env exists (KHÔNG ghi đè nếu đã có)
       - name: Prepare env
         run: |
           if [ ! -f /home/ShopDev/ShopDev/.env ]; then
-            echo ".env not found, copying from home..."
             cp /home/ShopDev/.env /home/ShopDev/ShopDev/.env
-            chmod 600 /home/ShopDev/ShopDev/.env
-          else
-            echo ".env already exists, skip"
           fi
 
-      # 3. Build images (CI task – không giữ process)
-      - name: Build images
+      - name: Deploy with Docker Compose
         working-directory: /home/ShopDev/ShopDev
         run: |
-          podman-compose build
-
-      # 4. Restart services (SYSTEMD OWNS LIFECYCLE)
-      - name: Restart services
-        run: |
-          systemctl --user restart container-ShopDevDB
-          systemctl --user restart container-ShopDevApp-1
-          systemctl --user restart container-ShopDevApp-2
-          systemctl --user restart container-ShopDevProxyNginx
-
-      # 5. Health check (đảm bảo deploy thành công)
-      - name: Health check
-        run: |
-          sleep 5
-          curl -f http://localhost:1200 || exit 1
+          docker compose down
+          docker compose up -d --build
