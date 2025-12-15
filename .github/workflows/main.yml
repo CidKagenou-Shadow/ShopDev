@@ -1,30 +1,36 @@
 name: ShopDevCICD
 
 on:
-    push:
-        branches: [ main ]
+  push:
+    branches: [ main ]
 
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: [self-hosted, shopdev]
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Show environment
         run: |
-            whoami
-            uname -a
-            podman --version
+          whoami
+          uname -a
+          pwd
+          podman --version
+          podman-compose --version
 
-      - name: copy env-file
-        run: /
-            cp /home/ShopDev/.env /home/ShopDev/ShopDev
-            ls -la /home/ShopDev/ShopDev
-        
+      - name: Copy env file
+        run: |
+          cp /home/ShopDev/.env /home/ShopDev/ShopDev/.env
+          ls -la /home/ShopDev/ShopDev
+
       - name: Build containers
+        working-directory: /home/ShopDev/ShopDev
         run: podman-compose build
 
       - name: Deploy
+        working-directory: /home/ShopDev/ShopDev
         run: |
-            podman-compose down
-            podman-compose up -d
-
+          podman-compose down
+          podman-compose up -d
