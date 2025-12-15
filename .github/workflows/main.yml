@@ -19,7 +19,11 @@ jobs:
           pwd
           podman --version
           podman-compose --version
-
+      - name : remove and clone code
+        working-directory: /home/ShopDev/
+        run: |
+          rm -rf ShopDev
+          git clone https://github.com/CidKagenou-Shadow/ShopDev.git
       - name: Copy env file
         run: |
           cp /home/ShopDev/.env /home/ShopDev/ShopDev/.env

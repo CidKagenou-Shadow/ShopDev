@@ -53,22 +53,6 @@ services:
       - "1202:1201"
     networks:
       - ShopDev_network
-  app-3:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: shopdev-app:latest
-    container_name: ShopDevApp-3
-    restart: always
-    depends_on:
-      - database
-    env_file:
-      - .env
-    ports:
-      - "1203:1201"
-    networks:
-      - ShopDev_network
-
   nginx:
     image : docker.io/library/nginx
     container_name: ShopDevProxyNginx
@@ -79,7 +63,6 @@ services:
     depends_on:
       - app-1
       - app-2
-      - app-3
     networks:
       - ShopDev_network
 
