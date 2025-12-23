@@ -20,7 +20,17 @@ class Database {
       .then((conn) => {
         console.log("Connected database !");
         console.log("Database name:", conn.connection.name);
-        return conn;
+
+        conn.connection.db.admin()
+        .command({ isMaster: 1 })
+        .then((info) => {
+          console.log("Mongo node:", info.me);
+          console.log("Is primary:", info.ismaster);
+          console.log("Is secondary:", info.secondary);
+        })
+        .catch((err) => {
+          console.log("Error get DB info:", err);
+        });
       })
       .catch((error) => {
         console.error("Error connecting to database:", error);

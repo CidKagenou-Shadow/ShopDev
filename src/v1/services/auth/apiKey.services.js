@@ -1,6 +1,6 @@
 const crypto = require('crypto');
-const ApiKeyRepo = require("../models/repositories/apiKey.repo.js");
-const { ErrorResponse, NotFoundError } = require('../core/response/error.response');
+const ApiKeyRepo = require("../../models/repositories/apiKey.repo.js");
+const { ErrorResponse, NotFoundError } = require('../../core/response/error.response.js');
 
 const createApiKey = async ({ permissions }) => {
   const key = crypto.randomBytes(32).toString("hex");

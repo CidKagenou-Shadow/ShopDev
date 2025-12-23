@@ -1,4 +1,4 @@
-const Shop = require('../shop.model.js');
+const Shop = require('../shop/shop.model.js');
 
 
 const findShopByEmail = async (email) => {

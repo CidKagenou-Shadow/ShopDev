@@ -20,6 +20,10 @@ services:
       MONGO_INITDB_ROOT_USERNAME: tankhangkm12
       MONGO_INITDB_ROOT_PASSWORD: TanKhangkm122@
       MONGO_INITDB_DATABASE: ShopDev
+    command: >
+      mongod
+      --replSet rs0
+      --bind_ip_all
     networks:
       - ShopDev_network
   app-1:

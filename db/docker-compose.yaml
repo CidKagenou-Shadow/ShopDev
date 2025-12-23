@@ -1,0 +1,56 @@
+version: "3.8"
+
+services:
+  mongo1:
+    image: mongo:8
+    container_name: mongo1
+    hostname: mongo1
+    command: ["mongod", "--replSet", "my-replica-set", "--bind_ip_all"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo1_data:/data/db
+
+  mongo2:
+    image: mongo:8
+    container_name: mongo2
+    hostname: mongo2
+    command: ["mongod", "--replSet", "my-replica-set", "--bind_ip_all"]
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo2_data:/data/db
+
+  mongo3:
+    image: mongo:8
+    container_name: mongo3
+    hostname: mongo3
+    command: ["mongod", "--replSet", "my-replica-set", "--bind_ip_all"]
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongo3_data:/data/db
+
+  mongo-init:
+    image: mongo:8
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    restart: "no"
+    command: >
+      mongosh --host mongo1 --eval "
+        rs.initiate({
+          _id: 'my-replica-set',
+          members: [
+            { _id: 0, host: 'mongo1:27017' },
+            { _id: 1, host: 'mongo2:27017' },
+            { _id: 2, host: 'mongo3:27017' }
+          ]
+        })
+      "
+
+volumes:
+  mongo1_data:
+  mongo2_data:
+  mongo3_data:

@@ -1,5 +1,5 @@
-const apiKeyModel = require("../api.key.model");
-const ApiKey = require("../api.key.model");
+const apiKeyModel = require("../auth/api.key.model");
+const ApiKey = require("../auth/api.key.model");
 
 const createApiKeyModel = ({ key, permissions }) => {
   return ApiKey.create({

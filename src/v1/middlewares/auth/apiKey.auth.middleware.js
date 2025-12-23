@@ -1,4 +1,4 @@
-const apiKeyService = require("../../services/apiKey.services.js");
+const apiKeyService = require("../../services/auth/apiKey.services.js");
 const {asyncHandler} = require("../../helpers/asyncHandler.helpers.js")
 
 const AutoCreateApiKeyMiddleware =  () => {

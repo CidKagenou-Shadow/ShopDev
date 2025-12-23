@@ -1,4 +1,4 @@
-const keySchema = require('../../models/key.model.js');
+const keySchema = require('../../models/auth/key.model.js');
 
 
 const createKeyModel = async ({

@@ -20,7 +20,7 @@ app.use(morgan("dev"));
 require("./src/v1/databases/connect.databases.js");
 
 
-AutoCreateApiKeyMiddleware();
+//AutoCreateApiKeyMiddleware();
 //router
 app.use("/", router);
 
@@ -36,7 +36,6 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(config.APP_PORT, () => {
-  console.log("Thanh Tân is very handsome !!!");
   console.log(
     `${config.APP_NAME} running in ${config.APP_ENV} on port ${config.APP_PORT}`,
   );
