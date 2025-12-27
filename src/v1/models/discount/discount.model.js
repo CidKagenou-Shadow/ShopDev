@@ -108,8 +108,7 @@ const discountSchema = new mongoose.Schema({
   },
 
   used_by_users: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: 'User',
+    type: Array,
     default: []
   },
 

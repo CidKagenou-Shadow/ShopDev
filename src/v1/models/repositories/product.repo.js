@@ -1,9 +1,7 @@
 const {productModel} = require("../product/product.model")
 
-const findAllProduct = ({shopId,start = 0, limit = 0}) => {
-    return productModel.find({
-        product_shop : shopId
-    }).sort({
+const findAllProduct = (options,start = 0, limit = 0) => {
+    return productModel.find(options).sort({
         createdAt : -1
     }).skip(start).limit(limit).lean()
 }

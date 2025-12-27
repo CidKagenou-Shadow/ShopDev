@@ -15,6 +15,9 @@ router.use("/v1/products",require("./product/index.js"))
 //shop
 router.use("/v1/shops",require("./shop/shop.route.js"));
 
+//discount
+router.use('/v1/discount',require("./discount/index.js"))
+
 
 
 module.exports = router;

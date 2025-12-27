@@ -24,9 +24,12 @@ class ProductServices{
     }
 
     static async getAllProduct({shopId}){
+        const options = {
+            product_shop : shopId
+        }
         const start = 0;
         const limit = 0;
-        const products = await findAllProduct({shopId,start,limit});
+        const products = await findAllProduct(options,start,limit);
         return {
             "product list" : getDataInfo(['_id','name','category','tags','price',
                     'stock','description','attributes','status','product_shop','images','slug','sku','isDraft','isPublished'],products)
